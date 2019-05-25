@@ -124,19 +124,17 @@ func RunWith(watcher Watcher, sources map[string][]string, delayOnDetect time.Du
 
 			p.lastChange = time.Now()
 			p.OnReload(filename)
-
-			// kill previous running instance
-			err := killProcess(p.proc, p.AppName)
-			if err != nil {
-				p.Err.Errorf("kill: %v", err)
-				return
-			}
-
 			// go build
-			err = buildProject(p)
+			err := buildProject(p)
 			if err != nil {
 				p.Err.Errorf(err.Error())
 				return
+			}
+
+			// kill previous running instance
+			err = killProcess(p.proc, p.AppName)
+			if err != nil {
+				p.Err.Errorf("kill: %v", err)
 			}
 
 			// exec run the builded program
@@ -147,7 +145,6 @@ func RunWith(watcher Watcher, sources map[string][]string, delayOnDetect time.Du
 			}
 
 			p.OnReloaded(filename)
-
 		}
 	})
 
